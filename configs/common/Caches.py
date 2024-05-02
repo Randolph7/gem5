@@ -77,6 +77,15 @@ class L2Cache(Cache):
     tgts_per_mshr = 12
     write_buffers = 8
 
+# Randolph: Add L3 Cache
+class L3Cache(Cache):
+    assoc = 16
+    tag_latency = 32
+    data_latency = 32
+    response_latency = 32
+    mshrs = 32
+    tgts_per_mshr = 20
+    write_buffers = 16
 
 class IOCache(Cache):
     assoc = 8

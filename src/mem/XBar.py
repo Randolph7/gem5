@@ -154,6 +154,16 @@ class SnoopFilter(SimObject):
     # Sanity check on max capacity to track, adjust if needed.
     max_capacity = Param.MemorySize("8MiB", "Maximum capacity of snoop filter")
 
+# Randolph: Add L3 Bar
+class L3XBar(CoherentXBar):
+    width = 32
+    frontend_latency = 1
+    forward_latency = 0
+    response_latency = 1
+    snoop_response_latency = 1
+    snoop_filter = SnoopFilter(lookup_latency = 0)
+    point_of_unification = True
+    #point_of_coherency = True
 
 # We use a coherent crossbar to connect multiple requestors to the L2
 # caches. Normally this crossbar would be part of the cache itself.

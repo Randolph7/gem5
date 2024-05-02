@@ -43,7 +43,6 @@
 import argparse
 import os
 import sys
-# import spec17_benchmarks
 
 import m5
 from m5.defines import buildEnv
