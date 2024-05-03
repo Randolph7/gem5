@@ -148,7 +148,7 @@ def config_cache(options, system):
         system.tol2bus = L2XBar(clk_domain=system.cpu_clk_domain)
         system.l2.cpu_side = system.tol2bus.mem_side_ports
         system.l2.mem_side = system.tol3bus.cpu_side_ports
-
+        
     if options.memchecker:
         system.memchecker = MemChecker()
 
