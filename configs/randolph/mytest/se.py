@@ -124,20 +124,12 @@ def get_processes(args):
     else:
         return multiprocesses, 1
 
-
-# warn(
-#     "The se.py script is deprecated. It will be removed in future releases of "
-#     " gem5."
-# )
-
 parser = argparse.ArgumentParser()
 Options.addCommonOptions(parser)
 Options.addSEOptions(parser)
 
-#randolph
-# parser.add_argument("-b", "--benchmark", type=str, default="", help="The SPEC benchmark to be loaded.")
-# parser.add_argument("--benchmark_stdout", type=str, default="", help="Absolute path for stdout redirection for the benchmark.")
-# parser.add_argument("--benchmark_stderr", type=str, default="", help="Absolute path for stderr redirection for the benchmark.")
+# Randolph: Add my hybrid memory parser
+Options.MyHybridOptions(parser)
 
 if "--ruby" in sys.argv:
     Ruby.define_options(parser)
@@ -190,12 +182,32 @@ if args.smt and args.num_cpus > 1:
 
 np = args.num_cpus
 mp0_path = multiprocesses[0].executable
-system = System(
-    cpu=[CPUClass(cpu_id=i) for i in range(np)],
-    mem_mode=test_mem_mode,
-    mem_ranges=[AddrRange(args.mem_size)],
-    cache_line_size=args.cacheline_size,
-)
+
+# system = System(
+#     cpu=[CPUClass(cpu_id=i) for i in range(np)],
+#     mem_mode=test_mem_mode,
+#     mem_ranges=[AddrRange(args.mem_size)],
+#     cache_line_size=args.cacheline_size,
+# )
+
+# Randolph: Add my hybrid memory options
+if (args.hybrid_type == "DRAMONLY"):
+    system = System(cpu=[CPUClass(cpu_id=i) for i in range(np)],
+                    mem_mode = test_mem_mode,
+                    mem_ranges = [AddrRange(args.mem_size)],
+                    cache_line_size = args.cacheline_size)
+
+elif (args.hybrid_type == "NVMONLY"):
+    system = System(cpu=[CPUClass(cpu_id=i) for i in range(np)],
+                    mem_mode = test_mem_mode,
+                    mem_ranges = [AddrRange(args.nvm_size)],
+                    cache_line_size = args.cacheline_size)
+else :
+    system = System(cpu=[CPUClass(cpu_id=i) for i in range(np)],
+                    mem_mode = test_mem_mode,
+                    mem_ranges = [AddrRange(args.mem_size),AddrRange(Addr(args.mem_size), size =args.nvm_size)],
+                    cache_line_size = args.cacheline_size)
+    args.hybrid_channel = True
 
 if numThreads > 1:
     system.multi_thread = True
@@ -292,7 +304,18 @@ else:
     system.system_port = system.membus.cpu_side_ports
     CacheConfig.config_cache(args, system)
     MemConfig.config_mem(args, system)
-    config_filesystem(system, args)
+
+    # Randolph: Add my hybrid memory config
+    # if (args.hybrid_type == "HYBRID"):
+    #     system.mem_ctrls[0].dram.addr_mapping = system.mem_ranges[0]
+    #     system.mem_ctrls[0].nvm.addr_mapping = system.mem_ranges[1]
+
+    # elif(args.hybrid_type == "DRAMONLY"):
+    #     system.mem_ctrls[0].dram.addr_mapping = system.mem_ranges
+    
+    # else:
+    #     system.mem_ctrls[0].nvm.addr_mapping = system.mem_ranges
+    #     config_filesystem(system, args)
 
 system.workload = SEWorkload.init_compatible(mp0_path)
 

@@ -50,7 +50,6 @@ from gem5.isas import ISA
 
 
 class L1Cache(Cache):
-    assoc = 2
     tag_latency = 2
     data_latency = 2
     response_latency = 2
@@ -59,14 +58,18 @@ class L1Cache(Cache):
 
 
 class L1_ICache(L1Cache):
+    assoc = 8
     is_read_only = True
     # Writeback clean lines as well
     writeback_clean = True
-    clusivity = 'mostly_excl'
+    # clusivity = 'mostly_excl'
+    clusivity = 'mostly_incl'
 
 class L1_DCache(L1Cache):
+    assoc = 8
     pass
-    clusivity = 'mostly_excl'
+    # clusivity = 'mostly_excl'
+    clusivity = 'mostly_incl'
 
 class L2Cache(Cache):
     assoc = 8
@@ -76,7 +79,8 @@ class L2Cache(Cache):
     mshrs = 20
     tgts_per_mshr = 12
     write_buffers = 8
-    clusivity = 'mostly_excl'
+    clusivity = 'mostly_incl'
+    # clusivity = 'mostly_excl'
 
 # Randolph: Add L3 Cache
 class L3Cache(Cache):
@@ -87,6 +91,8 @@ class L3Cache(Cache):
     mshrs = 32
     tgts_per_mshr = 20
     write_buffers = 16
+    clusivity = 'mostly_excl'
+    # clusivity = 'mostly_incl'
 
 class IOCache(Cache):
     assoc = 8
