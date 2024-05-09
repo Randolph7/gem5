@@ -62,11 +62,11 @@ class L1_ICache(L1Cache):
     is_read_only = True
     # Writeback clean lines as well
     writeback_clean = True
-    clusivity = 'mostly_excl'
+    # clusivity = 'mostly_excl'
 
 class L1_DCache(L1Cache):
     pass
-    clusivity = 'mostly_excl'
+    # clusivity = 'mostly_excl'
 
 class L2Cache(Cache):
     assoc = 8
@@ -76,7 +76,7 @@ class L2Cache(Cache):
     mshrs = 20
     tgts_per_mshr = 12
     write_buffers = 8
-    clusivity = 'mostly_excl'
+    # clusivity = 'mostly_excl'
 
 # Randolph: Add L3 Cache
 class L3Cache(Cache):
