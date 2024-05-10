@@ -98,8 +98,8 @@ def config_cache(options, system):
         dcache_class, icache_class, l2_cache_class, walk_cache_class = \
             core.HPI_DCache, core.HPI_ICache, core.HPI_L2, core.HPI_WalkCache
     else:
-        dcache_class, icache_class, l2_cache_class, walk_cache_class = \
-            L1_DCache, L1_ICache, L2Cache, None
+        dcache_class, icache_class, l2_cache_class, l3_cache_class, walk_cache_class = \
+            L1_DCache, L1_ICache, L2Cache, L3Cache, None
 
         if buildEnv['TARGET_ISA'] in ['x86', 'riscv']:
             walk_cache_class = PageTableWalkerCache
@@ -114,16 +114,27 @@ def config_cache(options, system):
     if options.l2cache and options.elastic_trace_en:
         fatal("When elastic trace is enabled, do not configure L2 caches.")
 
-    if options.l2cache:
+    if options.l3cache:
         # Provide a clock for the L2 and the L1-to-L2 bus here as they
         # are not connected using addTwoLevelCacheHierarchy. Use the
         # same clock as the CPUs.
-        system.l2 = l2_cache_class(clk_domain=system.cpu_clk_domain,
-                                   **_get_cache_opts('l2', options))
+        system.l3 = l3_cache_class(clk_domain=system.cpu_clk_domain,
+                                   **_get_cache_opts('l3', options))
 
-        system.tol2bus = L2XBar(clk_domain = system.cpu_clk_domain)
-        system.l2.cpu_side = system.tol2bus.master
-        system.l2.mem_side = system.membus.slave
+        system.tol3bus = L3XBar(clk_domain=system.cpu_clk_domain)
+        system.l3.cpu_side = system.tol3bus.mem_side_ports
+        system.l3.mem_side = system.membus.cpu_side_ports
+
+    elif options.l2cache:
+        # Provide a clock for the L2 and the L1-to-L2 bus here as they
+        # are not connected using addTwoLevelCacheHierarchy. Use the
+        # same clock as the CPUs.
+        system.l2 = l2_cache_class(
+            clk_domain=system.cpu_clk_domain, **_get_cache_opts("l2", options)
+        )
+        system.tol2bus = L2XBar(clk_domain=system.cpu_clk_domain)
+        system.l2.cpu_side = system.tol2bus.mem_side_ports
+        system.l2.mem_side = system.membus.cpu_side_ports
 
     if options.memchecker:
         system.memchecker = MemChecker()
@@ -186,7 +197,18 @@ def config_cache(options, system):
                         ExternalCache("cpu%d.dcache" % i))
 
         system.cpu[i].createInterruptController()
-        if options.l2cache:
+
+        # Randolph: Attach cache
+        if options.l3cache:
+            system.cpu[i].l2 = l2_cache_class(
+                clk_domain=system.cpu_clk_domain,
+                **_get_cache_opts("l2", options)
+            )
+            system.cpu[i].tol2bus = L2XBar(clk_domain=system.cpu_clk_domain)
+            system.cpu[i].l2.cpu_side = system.cpu[i].tol2bus.mem_side_ports
+            system.cpu[i].l2.mem_side = system.tol3bus.cpu_side_ports
+            system.cpu[i].connectAllPorts(system.cpu[i].tol2bus, system.membus)
+        elif options.l2cache:
             system.cpu[i].connectAllPorts(system.tol2bus, system.membus)
         elif options.external_memory_system:
             system.cpu[i].connectUncachedPorts(system.membus)
