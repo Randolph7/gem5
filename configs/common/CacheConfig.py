@@ -141,13 +141,13 @@ def config_cache(options, system):
         system.tol3bus = L3XBar(clk_domain=system.cpu_clk_domain)
         system.l3.cpu_side = system.tol3bus.mem_side_ports
         system.l3.mem_side = system.membus.cpu_side_ports
-    
-        # system.l2 = l2_cache_class(
-        #     clk_domain=system.cpu_clk_domain, **_get_cache_opts("l2", options)
-        # )
-        # system.tol2bus = L2XBar(clk_domain=system.cpu_clk_domain)
-        # system.l2.cpu_side = system.tol2bus.mem_side_ports
-        # system.l2.mem_side = system.tol3bus.cpu_side_ports
+    else :
+        system.l2 = l2_cache_class(
+            clk_domain=system.cpu_clk_domain, **_get_cache_opts("l2", options)
+        )
+        system.tol2bus = L2XBar(clk_domain=system.cpu_clk_domain)
+        system.l2.cpu_side = system.tol2bus.mem_side_ports
+        system.l2.mem_side = system.membus.cpu_side_ports
         
     if options.memchecker:
         system.memchecker = MemChecker()
@@ -221,17 +221,22 @@ def config_cache(options, system):
         system.cpu[i].createInterruptController()
 
         # Randolph: Add L3 cache
-        if options.l2cache:
+        if options.l3cache:
             system.cpu[i].l2 = l2_cache_class(
                clk_domain=system.cpu_clk_domain, **_get_cache_opts("l2", options)
             )
             system.cpu[i].tol2bus = L2XBar(clk_domain=system.cpu_clk_domain)
             system.cpu[i].l2.cpu_side = system.cpu[i].tol2bus.mem_side_ports
-            system.cpu[i].l2.mem_side = system.tol3bus.cpu_side_ports       
-
-        if options.l3cache:
+            system.cpu[i].l2.mem_side = system.tol3bus.cpu_side_ports
             system.cpu[i].connectAllPorts(
                 system.cpu[i].tol2bus.cpu_side_ports,
+                system.membus.cpu_side_ports,
+                system.membus.mem_side_ports
+            )    
+
+        elif options.l2cache:
+            system.cpu[i].connectAllPorts(
+                system.tol2bus.cpu_side_ports,
                 system.membus.cpu_side_ports,
                 system.membus.mem_side_ports
             )
