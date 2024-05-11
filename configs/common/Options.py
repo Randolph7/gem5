@@ -535,3 +535,25 @@ def addFSOptions(parser):
     parser.add_argument(
         "--command-line-file", action="store", default=None, type=str,
         help="File with a template for the kernel command line")
+
+# Randolph: Options for hybrid memory
+def MyHybridOptions(parser):
+
+    parser.add_argument("--hybrid-type", default="HYBRID",
+                        choices=["HYBRID", "DRAMONLY", "NVMONLY"],
+                        help = "type of memory to use")
+
+    parser.add_argument("--nvm-type", default="NVM_2400_1x64",
+                        choices=ObjectList.mem_list.get_names(),
+                        help = "type of memory to use")
+
+    parser.add_argument("--nvm-size", action="store", type=str,
+                        default="3GB",
+                        help="Specify the physical nvm size")
+
+    parser.add_argument("--nvm-ranks", type=int, default=1,
+                      help = "Number of ranks to iterate across")
+    
+    parser.add_argument("--addr-map",
+                        choices=ObjectList.dram_addr_map_list.get_names(),
+                        default="RoRaBaCoCh", help = "NVM address map policy")

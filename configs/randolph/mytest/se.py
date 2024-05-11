@@ -122,6 +122,9 @@ Options.addSEOptions(parser)
 if '--ruby' in sys.argv:
     Ruby.define_options(parser)
 
+# Randolph: Add my hybrid memory parser
+Options.MyHybridOptions(parser)
+
 args = parser.parse_args()
 
 multiprocesses = []
@@ -163,10 +166,26 @@ if args.smt and args.num_cpus > 1:
 
 np = args.num_cpus
 mp0_path = multiprocesses[0].executable
-system = System(cpu = [CPUClass(cpu_id=i) for i in range(np)],
-                mem_mode = test_mem_mode,
-                mem_ranges = [AddrRange(args.mem_size)],
-                cache_line_size = args.cacheline_size)
+
+if (args.hybrid_type == "DRAMONLY"):
+    system = System(cpu=[CPUClass(cpu_id=i) for i in range(np)],
+                    mem_mode = test_mem_mode,
+                    mem_ranges = [AddrRange(args.mem_size)],
+                    cache_line_size = args.cacheline_size)
+
+elif (args.hybrid_type == "NVMONLY"):
+    system = System(cpu=[CPUClass(cpu_id=i) for i in range(np)],
+                    mem_mode = test_mem_mode,
+                    mem_ranges = [AddrRange(args.nvm_size)],
+                    cache_line_size = args.cacheline_size)
+else :
+    system = System(cpu=[CPUClass(cpu_id=i) for i in range(np)],
+                    mem_mode = test_mem_mode,
+                    mem_ranges = [AddrRange(args.mem_size),
+                                  AddrRange(Addr(args.mem_size), 
+                                  size =args.nvm_size)],
+                    cache_line_size = args.cacheline_size)
+    args.hybrid_channel = True
 
 if numThreads > 1:
     system.multi_thread = True
@@ -256,7 +275,6 @@ if args.ruby:
 else:
     MemClass = Simulation.setMemClass(args)
     system.membus = SystemXBar()
-    # system.system_port = system.membus.slave
     system.system_port = system.membus.cpu_side_ports
     CacheConfig.config_cache(args, system)
     MemConfig.config_mem(args, system)
@@ -266,6 +284,14 @@ system.workload = SEWorkload.init_compatible(mp0_path)
 
 if args.wait_gdb:
     system.workload.wait_for_remote_gdb = True
+
+if (args.hybrid_type == "HYBRID"):
+    system.mem_ctrls[0].dram.addr_mapping = args.addr_map
+    system.mem_ctrls[0].nvm.addr_mapping = args.addr_map
+elif(args.hybrid_type == "DRAMONLY"):
+    system.mem_ctrls[0].dram.addr_mapping = args.addr_map
+else:
+    system.mem_ctrls[0].nvm.addr_mapping = args.addr_map
 
 root = Root(full_system = False, system = system)
 Simulation.run(args, root, system, FutureClass)
