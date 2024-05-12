@@ -918,3 +918,7 @@ def MyHybridOptions(parser):
 
     parser.add_argument("--nvm-ranks", type=int, default=1,
                       help = "Number of ranks to iterate across")
+    
+    parser.add_argument("--addr-map",
+                        choices=ObjectList.dram_addr_map_list.get_names(),
+                        default="RoRaBaCoCh", help = "NVM address map policy")

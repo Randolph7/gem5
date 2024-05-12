@@ -306,16 +306,16 @@ else:
     MemConfig.config_mem(args, system)
 
     # Randolph: Add my hybrid memory config
-    # if (args.hybrid_type == "HYBRID"):
-    #     system.mem_ctrls[0].dram.addr_mapping = system.mem_ranges[0]
-    #     system.mem_ctrls[0].nvm.addr_mapping = system.mem_ranges[1]
+    if (args.hybrid_type == "HYBRID"):
+        system.mem_ctrls[0].dram.addr_mapping = args.addr_map
+        system.mem_ctrls[0].nvm.addr_mapping = args.addr_map
 
-    # elif(args.hybrid_type == "DRAMONLY"):
-    #     system.mem_ctrls[0].dram.addr_mapping = system.mem_ranges
+    elif(args.hybrid_type == "DRAMONLY"):
+        system.mem_ctrls[0].dram.addr_mapping = args.addr_map
     
-    # else:
-    #     system.mem_ctrls[0].nvm.addr_mapping = system.mem_ranges
-    #     config_filesystem(system, args)
+    else:
+        system.mem_ctrls[0].nvm.addr_mapping = args.addr_map
+        config_filesystem(system, args)
 
 system.workload = SEWorkload.init_compatible(mp0_path)
 
