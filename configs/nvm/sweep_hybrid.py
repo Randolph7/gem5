@@ -39,7 +39,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import math
-import optparse
+import argparse
 
 import m5
 from m5.objects import *
@@ -56,38 +56,38 @@ from common import MemConfig
 # and the sequential stride size (how many bytes per activate), and
 # observe what bus utilisation (bandwidth) is achieved
 
-parser = optparse.OptionParser()
+parser = argparse.ArgumentParser()
 
 hybrid_generators = {
     "HYBRID" : lambda x: x.createHybrid,
 }
 
 # Use a single-channel DDR3-1600 x64 (8x8 topology) by default
-parser.add_option("--nvm-type", type="choice", default="NVM_2400_1x64",
+parser.add_argument("--nvm-type", default="NVM_2400_1x64",
                   choices=ObjectList.mem_list.get_names(),
                   help = "type of memory to use")
 
-parser.add_option("--mem-type", type="choice", default="DDR4_2400_16x4",
+parser.add_argument("--mem-type", default="DDR4_2400_16x4",
                   choices=ObjectList.mem_list.get_names(),
                   help = "type of memory to use")
 
-parser.add_option("--nvm-ranks", "-n", type="int", default=1,
+parser.add_argument("--nvm-ranks", "-n", type=int, default=1,
                   help = "Number of ranks to iterate across")
 
-parser.add_option("--mem-ranks", "-r", type="int", default=2,
+parser.add_argument("--mem-ranks", "-r", type=int, default=2,
                   help = "Number of ranks to iterate across")
 
-parser.add_option("--rd-perc", type="int", default=100,
+parser.add_argument("--rd-perc", type=int, default=100,
                   help = "Percentage of read commands")
 
-parser.add_option("--nvm-perc", type="int", default=100,
+parser.add_argument("--nvm-perc", type=int, default=100,
                   help = "Percentage of NVM commands")
 
-parser.add_option("--mode", type="choice", default="HYBRID",
+parser.add_argument("--mode", default="HYBRID",
                   choices=hybrid_generators.keys(),
                   help = "Hybrid: Random DRAM + NVM traffic")
 
-parser.add_option("--addr-map", type="choice",
+parser.add_argument("--addr-map", 
                   choices=ObjectList.dram_addr_map_list.get_names(),
                   default="RoRaBaCoCh", help = "NVM address map policy")
 
