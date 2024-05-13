@@ -47,63 +47,44 @@ from m5.util import (
     warn,
 )
 
+from gem5.isas import ISA
+
 addToPath("../../")
 
 from common import (
     MemConfig,
     Options,
     Simulation,
-    # myCacheConfig,
+    CacheConfig,
+    CpuConfig,
+    ObjectList,
+    
 )
 from common.Caches import *
+from common.cpu2000 import *
+from common.FileSystemConfig import config_filesystem
+from ruby import Ruby
 
-def config_cache(args, system):
-    """
-    Configure the cache hierarchy.  Only two configurations are natively
-    supported as an example: L1(I/D) only or L1 + L2.
-    """
-    from common.CacheConfig import _get_cache_opts
-
-    system.l1i = L1_ICache(**_get_cache_opts("l1i", args))
-    system.l1d = L1_DCache(**_get_cache_opts("l1d", args))
-
-    system.cpu.dcache_port = system.l1d.cpu_side
-    system.cpu.icache_port = system.l1i.cpu_side
-
-    if args.l2cache:
-        # Provide a clock for the L2 and the L1-to-L2 bus here as they
-        # are not connected using addTwoLevelCacheHierarchy. Use the
-        # same clock as the CPUs.
-        system.l2 = L2Cache(
-            clk_domain=system.cpu_clk_domain, **_get_cache_opts("l2", args)
-        )
-
-        system.tol2bus = L2XBar(clk_domain=system.cpu_clk_domain)
-        system.l2.cpu_side = system.tol2bus.mem_side_ports
-        system.l2.mem_side = system.membus.cpu_side_ports
-
-        system.l1i.mem_side = system.tol2bus.cpu_side_ports
-        system.l1d.mem_side = system.tol2bus.cpu_side_ports
-    else:
-        system.l1i.mem_side = system.membus.cpu_side_ports
-        system.l1d.mem_side = system.membus.cpu_side_ports
-
-# from common.AddrRange import AddrRange
 parser = argparse.ArgumentParser()
 Options.addCommonOptions(parser)
-Options.addSEOptions(parser)        #added!
-Options.MyHybridOptions(parser)  #added! options for Hybrid Memory
+Options.MyHybridOptions(parser)  
+
+if "--ruby" in sys.argv:
+    print(
+        "This script does not support Ruby configuration, mainly"
+        " because Trace CPU has been tested only with classic memory system"
+    )
+    sys.exit(1)
 
 args = parser.parse_args()
+
+np = args.num_cpus
+
+(CPUClass, test_mem_mode, FutureClass) = Simulation.setCPUClass(args)
 
 if args.num_cpus > 1:
     fatal("This script does not support multi-processor trace replay.\n")
 
-(CPUClass, test_mem_mode, FutureClass) = Simulation.setCPUClass(args)
-
-np = args.num_cpus
-
-# Randolph: Add my hybrid memory options
 if (args.hybrid_type == "DRAMONLY"):
     system = System(cpu=[CPUClass(cpu_id=i) for i in range(np)],
                     mem_mode = test_mem_mode,
@@ -121,10 +102,9 @@ else :
                     mem_ranges = [AddrRange(args.mem_size),AddrRange(Addr(args.mem_size), size =args.nvm_size)],
                     cache_line_size = args.cacheline_size)
     args.hybrid_channel = True
-    options.hybrid_channel = True #if HYBRID, it needs
-    
+
 # Generate the TraceCPU
-system.cpu = TraceCPU()
+# system.cpu = TraceCPU()
 
 # Create a top-level voltage domain
 system.voltage_domain = VoltageDomain(voltage=args.sys_voltage)
@@ -157,8 +137,19 @@ system.cpu.dataTraceFile = args.data_trace_file
 MemClass = Simulation.setMemClass(args)
 system.membus = SystemXBar()
 system.system_port = system.membus.cpu_side_ports
-config_cache(args, system)
+
+# Configure the classic cache hierarchy
+CacheConfig.config_cache(args, system)
+
 MemConfig.config_mem(args, system)
+
+if (args.hybrid_type == "HYBRID"):
+    system.mem_ctrls[0].dram.addr_mapping = args.addr_map
+    system.mem_ctrls[0].nvm.addr_mapping = args.addr_map
+elif(args.hybrid_type == "DRAMONLY"):
+    system.mem_ctrls[0].dram.addr_mapping = args.addr_map
+else:
+    system.mem_ctrls[0].nvm.addr_mapping = args.addr_map
 
 root = Root(full_system=False, system=system)
 Simulation.run(args, root, system, None)
