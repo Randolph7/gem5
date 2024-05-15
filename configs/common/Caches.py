@@ -74,6 +74,7 @@ class L2Cache(Cache):
     write_buffers = 8
     # clusivity = 'mostly_excl'
     clusivity = 'mostly_incl'
+    replacement_policy = LILRURP()
 
 # Randolph: Add L3 Cache
 class L3Cache(Cache):
