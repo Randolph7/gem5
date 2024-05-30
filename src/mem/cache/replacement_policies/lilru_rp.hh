@@ -35,6 +35,7 @@
 #define __MEM_CACHE_REPLACEMENT_POLICIES_LILRU_RP_HH__
 
 #include "mem/cache/replacement_policies/lru_rp.hh"
+#include "mem/cache/base.hh"
 
 namespace gem5
 {
@@ -48,22 +49,33 @@ namespace replacement_policy
 class LILRU : public LRU
 {
   protected:
+    // Randolph: Use baseCache information
+    static BaseCache* baseCache;
+
     /** LILRU-specific implementation of replacement data. */
     struct LILRUReplData : ReplacementData
     {
         /** Tick on which the entry was last touched. */
         Tick lastTouchTick;
 
+        /** Cycles per thread/command spent waiting for a miss.  */
+        Tick missPenalty;
+
+        /** Flag for reused cacheline.  */
+        bool reusedFlag;  
+
         /**
          * Default constructor. Invalidate data.
          */
-        LILRUReplData() : lastTouchTick(0) {}
+        LILRUReplData() : lastTouchTick(0), missPenalty(0), reusedFlag(true) {}
     };
 
   public:
     typedef LILRURPParams Params;
     LILRU(const Params &p);
     ~LILRU() = default;
+
+    void setBaseCache(BaseCache* bc);
 
     /**
      * Invalidate replacement data to set it as the next probable victim.
@@ -107,6 +119,7 @@ class LILRU : public LRU
      * @return A shared pointer to the new replacement data.
      */
     std::shared_ptr<ReplacementData> instantiateEntry() override;
+    
 };
 
 } // namespace replacement_policy

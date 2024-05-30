@@ -49,6 +49,7 @@
 #include <cassert>
 #include <cstdint>
 #include <string>
+#include <unordered_map>  // Include this header for unordered_map
 
 #include "base/addr_range.hh"
 #include "base/compiler.hh"
@@ -84,6 +85,14 @@ namespace prefetch
 {
     class Base;
 }
+
+GEM5_DEPRECATED_NAMESPACE(ReplacementPolicy, replacement_policy);
+namespace replacement_policy
+{
+    // Randolph: Add get miss latency
+    extern Tick LastMissLatency;
+}
+
 class MSHR;
 class RequestPort;
 class QueueEntry;
@@ -95,6 +104,12 @@ struct BaseCacheParams;
 class BaseCache : public ClockedObject
 {
   protected:
+    // Add a map to track miss and hit times
+    std::unordered_map<Addr, Tick> missTimes;
+
+    // Add a function to record miss and hit latency
+    void recordMissHitLatency(Addr addr, Tick hitTime);
+
     /**
      * Indexes to enumerate the MSHR queues.
      */

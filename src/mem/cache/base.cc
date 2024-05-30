@@ -141,6 +141,16 @@ BaseCache::~BaseCache()
     delete tempBlock;
 }
 
+// Randolph: 
+void
+BaseCache::recordMissHitLatency(Addr addr, Tick hitTime)
+{
+    Tick missTime = missTimes[addr];
+    Tick latency = hitTime - missTime;
+    DPRINTF(CacheRepl, "Miss-Hit Latency for addr %#llx: %lu ticks\n", addr, latency);
+    replacement_policy::LastMissLatency = latency;
+}
+
 void
 BaseCache::CacheResponsePort::setBlocked()
 {
@@ -390,8 +400,12 @@ BaseCache::recvTimingReq(PacketPtr pkt)
 
         handleTimingReqHit(pkt, blk, request_time);
     } else {
+        // Randolph:
+        if (std::string(name()).find("system.l2") != std::string::npos)
+        {
+            missTimes[pkt->getAddr()] = curTick();
+        }
         handleTimingReqMiss(pkt, blk, forward_time, request_time);
-
         ppMiss->notify(pkt);
     }
 
@@ -458,6 +472,15 @@ BaseCache::recvTimingResp(PacketPtr pkt)
     // Initial target is used just for stats
     const QueueEntry::Target *initial_tgt = mshr->getTarget();
     const Tick miss_latency = curTick() - initial_tgt->recvTime;
+    
+    // Randolph: Update tick only for system.l2
+    // if (std::string(name()).find("system.l2") != std::string::npos) {
+    //     // Randolph: Update tick
+    //     replacement_policy::LastMSHRMissLatency = miss_latency;
+    //     // Randolph: Print tick
+    //     DPRINTF(CacheRepl, "Randolph: yyyyyy Last MSHR miss latency: %lu\n", miss_latency);
+    // }
+
     if (pkt->req->isUncacheable()) {
         assert(pkt->req->requestorId() < system->maxRequestors());
         stats.cmdStats(initial_tgt->pkt)
@@ -549,6 +572,16 @@ BaseCache::recvTimingResp(PacketPtr pkt)
     const Tick forward_time = clockEdge(forwardLatency) + pkt->headerDelay;
     // copy writebacks to write buffer
     doWritebacks(writebacks, forward_time);
+
+    // Randolph: Record the hit time and calculate the latency
+    if (std::string(name()).find("system.l2") != std::string::npos)
+    {
+        if (missTimes.find(pkt->getAddr()) != missTimes.end()) 
+        {
+            recordMissHitLatency(pkt->getAddr(), curTick());
+            missTimes.erase(pkt->getAddr());
+        }
+    }
 
     DPRINTF(CacheVerbose, "%s: Leaving with %s\n", __func__, pkt->print());
     delete pkt;
@@ -964,8 +997,8 @@ BaseCache::updateCompressionData(CacheBlk *&blk, const uint64_t* data,
             }
 
             // Print victim block's information
-            DPRINTF(CacheRepl, "Data %s replacement victim: %s\n",
-                op_name, victim->print());
+            // DPRINTF(CacheRepl, "Data %s replacement victim: %s\n",
+            //     op_name, victim->print());
         } else {
             // If we do not move the expanded block, we must make room for
             // the expansion to happen, so evict every co-allocated block
@@ -1563,7 +1596,7 @@ BaseCache::allocateBlock(const PacketPtr pkt, PacketList &writebacks)
         return nullptr;
 
     // Print victim block's information
-    DPRINTF(CacheRepl, "Replacement victim: %s\n", victim->print());
+    // DPRINTF(CacheRepl, "Replacement victim: %s\n", victim->print());
 
     // Try to evict blocks; if it fails, give up on allocation
     if (!handleEvictions(evict_blks, writebacks)) {
