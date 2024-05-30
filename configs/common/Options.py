@@ -106,7 +106,7 @@ def addNoISAOptions(parser):
     parser.add_option("--mem-ranks", type="int", default=None,
                       help = "number of memory ranks per channel")
     parser.add_option("--mem-size", action="store", type="string",
-                      default="512MB",
+                      default="1MB",
                       help="Specify the physical memory size (single memory)")
     parser.add_option("--enable-dram-powerdown", action="store_true",
                        help="Enable low-power states in DRAMInterface")
@@ -483,3 +483,25 @@ def addFSOptions(parser):
     parser.add_option("--command-line-file", action="store",
                       default=None, type="string",
                       help="File with a template for the kernel command line")
+
+# Randolph: Options for hybrid memory
+def MyHybridOptions(parser):
+
+    parser.add_option("--hybrid-type", default="HYBRID",
+                        choices=["HYBRID", "DRAMONLY", "NVMONLY"],
+                        help = "type of memory to use")
+
+    parser.add_option("--nvm-type", default="NVM_2400_1x64",
+                        choices=ObjectList.mem_list.get_names(),
+                        help = "type of memory to use")
+
+    parser.add_option("--nvm-size", action="store", type=str,
+                        default="3GB",
+                        help="Specify the physical nvm size")
+
+    parser.add_option("--nvm-ranks", type=int, default=1,
+                      help = "Number of ranks to iterate across")
+    
+    parser.add_option("--addr-map",
+                        choices=ObjectList.dram_addr_map_list.get_names(),
+                        default="RoRaBaCoCh", help = "NVM address map policy")
