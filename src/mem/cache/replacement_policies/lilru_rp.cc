@@ -63,12 +63,19 @@ LILRU::invalidate(const std::shared_ptr<ReplacementData>& replacement_data)
 void
 LILRU::touch(const std::shared_ptr<ReplacementData>& replacement_data) const
 {
+    static int num_insert_hit;
     LRU::touch(replacement_data);
     // Update last touch timestamp
     std::static_pointer_cast<LILRUReplData>(
         replacement_data)->lastTouchTick = curTick();
-    std::static_pointer_cast<LILRUReplData>(
-        replacement_data)->reusedFlag = false;
+    if(std::static_pointer_cast<LILRUReplData>(
+        replacement_data)->reusedFlag = true)
+        {
+            std::static_pointer_cast<LILRUReplData>(
+                replacement_data)->reusedFlag = false;
+            num_insert_hit+=1;
+            DPRINTF(CacheRepl, "Randolph: total inserts hit: %d\n",num_insert_hit);
+        }
 }
 
 // Randolph: Give new parameters when reset
@@ -85,13 +92,16 @@ LILRU::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
         replacement_data)->reusedFlag = false;
 
     // Randolph: Print tick
-    DPRINTF(CacheRepl, "Randolph: nnnnnn Last miss latency: %lu\n", LastMissLatency);
+    // DPRINTF(CacheRepl, "Randolph: nnnnnn Last miss latency: %lu\n", LastMissLatency);
 }
 
 // Randolph: Change sequance test func
 ReplaceableEntry*
 LILRU::getVictim(const ReplacementCandidates& candidates) const
 {
+    // Hit count of inserted cacheline
+    static int num_insert, num_insert_miss;
+
     // There must be at least one replacement candidate
     assert(candidates.size() > 0);
 
@@ -109,7 +119,10 @@ LILRU::getVictim(const ReplacementCandidates& candidates) const
     smallestMissPenalty = std::static_pointer_cast<LILRUReplData>(smallest->replacementData)->missPenalty;
 
     // If the smallest candidate's reusedFlag is true, evict it
-    if (std::static_pointer_cast<LILRUReplData>(smallest->replacementData)->reusedFlag) {
+    if (std::static_pointer_cast<LILRUReplData>(smallest->replacementData)->reusedFlag==true) {
+        // DPRINTF(CacheRepl, "Randolph: nnnnnn Last miss latency: %lu\n", LastMissLatency)
+        num_insert_miss+=1;
+        DPRINTF(CacheRepl, "Randolph: total inserts miss: %d\n",num_insert_miss);
         return smallest;
     }
 
@@ -163,7 +176,8 @@ LILRU::getVictim(const ReplacementCandidates& candidates) const
             std::static_pointer_cast<LILRUReplData>(lastCandidates[i]->replacementData)->lastTouchTick =
                 std::static_pointer_cast<LILRUReplData>(lastCandidates[i - 1]->replacementData)->lastTouchTick;
         }
-
+        num_insert+=1;
+        DPRINTF(CacheRepl, "Randolph: total inserts: %d at count: %d\n",num_insert,count);
         return lastCandidates[0];
     }
 

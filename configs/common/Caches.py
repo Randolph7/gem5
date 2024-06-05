@@ -73,9 +73,9 @@ class L2Cache(Cache):
     tgts_per_mshr = 12
     write_buffers = 8
     clusivity = 'mostly_excl'
-    # replacement_policy = LRURP()
+    replacement_policy = LRURP()
     # clusivity = 'mostly_incl'
-    replacement_policy = LILRURP()
+    # replacement_policy = LILRURP()
     # replacement_policy = SHiPMemRP()
 
 # Randolph: Add L3 Cache

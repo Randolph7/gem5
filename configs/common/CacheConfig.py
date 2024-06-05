@@ -67,6 +67,14 @@ def _get_cache_opts(level, options):
     if hasattr(options, prefetcher_attr):
         opts['prefetcher'] = _get_hwp(getattr(options, prefetcher_attr))
 
+    # 添加对替换策略的支持
+    replacement_policy_attr = '{}_replacement_policy'.format(level)
+    if hasattr(options, replacement_policy_attr):
+        replacement_policy_name = getattr(options, replacement_policy_attr)
+        if replacement_policy_name:
+            replacement_policy_class = ObjectList.rp_list.get(replacement_policy_name)
+            opts['replacement_policy'] = replacement_policy_class()
+
     return opts
 
 def config_cache(options, system):

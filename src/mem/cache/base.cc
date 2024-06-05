@@ -147,7 +147,7 @@ BaseCache::recordMissHitLatency(Addr addr, Tick hitTime)
 {
     Tick missTime = missTimes[addr];
     Tick latency = hitTime - missTime;
-    DPRINTF(CacheRepl, "Miss-Hit Latency for addr %#llx: %lu ticks\n", addr, latency);
+    // DPRINTF(CacheRepl, "Miss-Hit Latency for addr %#llx: %lu ticks\n", addr, latency);
     replacement_policy::LastMissLatency = latency;
 }
 

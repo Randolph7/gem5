@@ -238,6 +238,13 @@ def addCommonOptions(parser):
                         type of hardware prefetcher to use with the L2 cache.
                         (if not set, use the default prefetcher of
                         the selected cache)""")
+    parser.add_argument("--l2-replacement-policy",
+                        choices=ObjectList.rp_list.get_names(),
+                        help="""
+                        type of replacement policy to use with the L2 cache.
+                        ( if not set, use the default replacement policy of
+                        the selected cache)""")
+
     parser.add_argument("--checker", action="store_true")
     parser.add_argument("--cpu-clock", action="store", type=str,
                         default='2GHz',
