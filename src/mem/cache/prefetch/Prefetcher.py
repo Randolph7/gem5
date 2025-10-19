@@ -560,6 +560,27 @@ class SlimAMPMPrefetcher(QueuedPrefetcher):
     )
 
 
+class BingoPrefetcher(QueuedPrefetcher):
+    type = "BingoPrefetcher"
+    cxx_class = "gem5::prefetch::Bingo"
+    cxx_header = "mem/cache/prefetch/bingo.hh"
+
+    signature_table_entries = Param.Unsigned(
+        256, "Entries in the trigger signature table"
+    )
+    pattern_table_entries = Param.Unsigned(
+        4096, "Entries in the learned pattern table"
+    )
+    max_region_offsets = Param.Unsigned(
+        16, "Max number of offsets stored per pattern"
+    )
+    confidence_threshold = Param.Unsigned(
+        2, "Confidence needed for a pattern offset to be used"
+    )
+    max_prefetch_distance = Param.Unsigned(
+        32, "Max distance (in blocks) Bingo can prefetch ahead"
+    )
+
 class BOPPrefetcher(QueuedPrefetcher):
     type = "BOPPrefetcher"
     cxx_class = "gem5::prefetch::BOP"
@@ -727,3 +748,12 @@ class PIFPrefetcher(QueuedPrefetcher):
         self.addEvent(
             HWPProbeEventRetiredInsts(self, simObj, "RetiredInstsPC")
         )
+
+
+
+
+
+
+
+
+
