@@ -565,20 +565,36 @@ class BingoPrefetcher(QueuedPrefetcher):
     cxx_class = "gem5::prefetch::Bingo"
     cxx_header = "mem/cache/prefetch/bingo.hh"
 
-    signature_table_entries = Param.Unsigned(
-        256, "Entries in the trigger signature table"
+    region_size = Param.MemorySize(
+        "2KiB", "Size of the spatial region tracked per trigger"
     )
-    pattern_table_entries = Param.Unsigned(
-        4096, "Entries in the learned pattern table"
+    filter_table_entries = Param.Unsigned(
+        64, "Entries in the filter table"
     )
-    max_region_offsets = Param.Unsigned(
-        16, "Max number of offsets stored per pattern"
+    accumulation_table_entries = Param.Unsigned(
+        128, "Entries in the accumulation table"
     )
-    confidence_threshold = Param.Unsigned(
-        2, "Confidence needed for a pattern offset to be used"
+    pht_entries = Param.Unsigned(
+        16 * 1024, "Entries per pattern history table"
     )
-    max_prefetch_distance = Param.Unsigned(
-        32, "Max distance (in blocks) Bingo can prefetch ahead"
+    pht_assoc = Param.Unsigned(
+        16, "Associativity of each pattern history table"
+    )
+    min_addr_width = Param.Unsigned(
+        5, "Bits of block address used for coarse matching"
+    )
+    max_addr_width = Param.Unsigned(
+        16, "Bits of block address used for fine matching"
+    )
+    pc_width = Param.Unsigned(
+        16, "Bits of PC included in the trigger signature"
+    )
+    vote_threshold = Param.Percent(
+        20, "Voting threshold (percent) for fallback pattern selection"
+    )
+    multi_table_modes = VectorParam.String(
+        [],
+        "Ordered list of pattern-table modes (pc+addr, addr, pc+offs, pc, offs)",
     )
 
 class BOPPrefetcher(QueuedPrefetcher):
