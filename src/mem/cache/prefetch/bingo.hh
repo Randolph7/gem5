@@ -72,6 +72,7 @@ class Bingo : public Queued
                            std::vector<AddrPriority> &addresses,
                            const CacheAccessor &cache) override;
 
+    using EvictionInfo = CacheDataUpdateProbeArg;
     void notifyEvict(const EvictionInfo &info) override;
 
   private:

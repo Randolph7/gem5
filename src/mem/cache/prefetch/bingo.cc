@@ -588,7 +588,6 @@ Bingo::Bingo(const BingoPrefetcherParams &p)
     }
 }
 
-uint64_t
 void
 Bingo::commitAccumulation(const RegionKey &key, const AccumEntry &entry)
 {
