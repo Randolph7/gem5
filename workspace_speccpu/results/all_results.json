@@ -1,0 +1,118 @@
+{
+  "mcf_r": {
+    "no_prefetch": {
+      "simTicks": 21104602500.0,
+      "simSeconds": 0.021105,
+      "ipc": 0.23691514682638537,
+      "system.cpu.dcache.overallMisses::total": 38512.0,
+      "system.l2.overallMisses::total": 37855.0,
+      "coverage": NaN,
+      "accuracy": NaN
+    },
+    "bingo_single": {
+      "simTicks": 19147046500.0,
+      "simSeconds": 0.019147,
+      "ipc": 0.261136880823891,
+      "system.cpu.dcache.overallMisses::total": 38512.0,
+      "system.l2.overallMisses::total": 9250.0,
+      "coverage": 0.755647,
+      "accuracy": 0.97658
+    },
+    "bingo_multi": {
+      "simTicks": 19147046500.0,
+      "simSeconds": 0.019147,
+      "ipc": 0.261136880823891,
+      "system.cpu.dcache.overallMisses::total": 38512.0,
+      "system.l2.overallMisses::total": 9250.0,
+      "coverage": 0.755647,
+      "accuracy": 0.97658
+    }
+  },
+  "deepsjeng_r": {
+    "no_prefetch": {
+      "simTicks": 127726888500.0,
+      "simSeconds": 0.127727,
+      "ipc": 0.03914602523179761,
+      "system.cpu.dcache.overallMisses::total": 1284351.0,
+      "system.l2.overallMisses::total": 1285412.0,
+      "coverage": NaN,
+      "accuracy": NaN
+    },
+    "bingo_single": {
+      "simTicks": 44675354500.0,
+      "simSeconds": 0.044675,
+      "ipc": 0.11191852993578372,
+      "system.cpu.dcache.overallMisses::total": 1284351.0,
+      "system.l2.overallMisses::total": 48766.0,
+      "coverage": 0.962062,
+      "accuracy": 0.999973
+    },
+    "bingo_multi": {
+      "simTicks": 44675354500.0,
+      "simSeconds": 0.044675,
+      "ipc": 0.11191852993578372,
+      "system.cpu.dcache.overallMisses::total": 1284351.0,
+      "system.l2.overallMisses::total": 48766.0,
+      "coverage": 0.962062,
+      "accuracy": 0.999973
+    }
+  },
+  "leela_r": {
+    "no_prefetch": {
+      "simTicks": 21193568500.0,
+      "simSeconds": 0.021194,
+      "ipc": 0.2359206284680185,
+      "system.cpu.dcache.overallMisses::total": 49357.0,
+      "system.l2.overallMisses::total": 45202.0,
+      "coverage": NaN,
+      "accuracy": NaN
+    },
+    "bingo_single": {
+      "simTicks": 19354056500.0,
+      "simSeconds": 0.019354,
+      "ipc": 0.25834377408167636,
+      "system.cpu.dcache.overallMisses::total": 49357.0,
+      "system.l2.overallMisses::total": 15287.0,
+      "coverage": 0.661822,
+      "accuracy": 0.951071
+    },
+    "bingo_multi": {
+      "simTicks": 19375861500.0,
+      "simSeconds": 0.019376,
+      "ipc": 0.2580530419253874,
+      "system.cpu.dcache.overallMisses::total": 49357.0,
+      "system.l2.overallMisses::total": 15606.0,
+      "coverage": 0.654779,
+      "accuracy": 0.961846
+    }
+  },
+  "nab_r": {
+    "no_prefetch": {
+      "simTicks": 603110500.0,
+      "simSeconds": 0.000603,
+      "ipc": 0.1441286464089085,
+      "system.cpu.dcache.overallMisses::total": 2729.0,
+      "system.l2.overallMisses::total": 3811.0,
+      "coverage": NaN,
+      "accuracy": NaN
+    },
+    "bingo_single": {
+      "simTicks": 603110500.0,
+      "simSeconds": 0.000603,
+      "ipc": 0.1441286464089085,
+      "system.cpu.dcache.overallMisses::total": 2729.0,
+      "system.l2.overallMisses::total": 3810.0,
+      "coverage": 0.000262,
+      "accuracy": 0.166667
+    },
+    "bingo_multi": {
+      "simTicks": 603110500.0,
+      "simSeconds": 0.000603,
+      "ipc": 0.1441286464089085,
+      "system.cpu.dcache.overallMisses::total": 2729.0,
+      "system.l2.overallMisses::total": 3810.0,
+      "coverage": 0.000262,
+      "accuracy": 0.166667
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "no_prefetch": {
+    "simTicks": 21104602500.0,
+    "simSeconds": 0.021105,
+    "ipc": 0.23691514682638537,
+    "system.cpu.dcache.overallMisses::total": 38512.0,
+    "system.l2.overallMisses::total": 37855.0,
+    "coverage": NaN,
+    "accuracy": NaN
+  },
+  "bingo_single": {
+    "simTicks": 19147046500.0,
+    "simSeconds": 0.019147,
+    "ipc": 0.261136880823891,
+    "system.cpu.dcache.overallMisses::total": 38512.0,
+    "system.l2.overallMisses::total": 9250.0,
+    "coverage": 0.755647,
+    "accuracy": 0.97658
+  },
+  "bingo_multi": {
+    "simTicks": 19147046500.0,
+    "simSeconds": 0.019147,
+    "ipc": 0.261136880823891,
+    "system.cpu.dcache.overallMisses::total": 38512.0,
+    "system.l2.overallMisses::total": 9250.0,
+    "coverage": 0.755647,
+    "accuracy": 0.97658
+  }
+}
